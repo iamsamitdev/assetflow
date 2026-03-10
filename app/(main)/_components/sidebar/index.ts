@@ -1,0 +1,5 @@
+export { Sidebar } from "@/app/(main)/_components/sidebar/sidebar"
+export { NavItem } from "@/app/(main)/_components/sidebar/nav-item"
+export { NavSection } from "@/app/(main)/_components/sidebar/nav-section"
+export { sidebarData, bottomNavItems } from "@/app/(main)/_components/sidebar/sidebar-data"
+export type { NavItemType, NavSectionType } from "@/app/(main)/_components/sidebar/sidebar-data"

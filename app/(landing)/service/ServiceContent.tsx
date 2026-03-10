@@ -146,24 +146,24 @@ export default function ServiceContent() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-6">
           {plans.map((plan) => (
-            <Card
-              key={plan.name}
-              className={`relative flex flex-col transition-all duration-300 hover:shadow-lg ${
-                plan.highlight
-                  ? "border-emerald-500 dark:border-emerald-400 shadow-md scale-[1.02]"
-                  : "hover:border-emerald-200 dark:hover:border-emerald-800"
-              }`}
-            >
+            <div key={plan.name} className="relative flex flex-col">
               {plan.highlight && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
                   <Badge className="bg-emerald-500 text-white px-3 py-1">
                     <Rocket className="w-3 h-3 mr-1" />
                     แนะนำ
                   </Badge>
                 </div>
               )}
+            <Card
+              className={`relative flex flex-col flex-1 transition-all duration-300 hover:shadow-lg ${
+                plan.highlight
+                  ? "border-emerald-500 dark:border-emerald-400 shadow-md scale-[1.02]"
+                  : "hover:border-emerald-200 dark:hover:border-emerald-800"
+              }`}
+            >
               <CardHeader className="text-center pb-2">
                 <CardTitle className="text-lg">{plan.name}</CardTitle>
                 <p className="text-3xl font-bold mt-2">{plan.price}</p>
@@ -194,6 +194,7 @@ export default function ServiceContent() {
                 </Button>
               </CardContent>
             </Card>
+            </div>
           ))}
         </div>
       </div>

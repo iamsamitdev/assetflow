@@ -1,8 +1,6 @@
 import type { Metadata } from "next"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import Navbar from "@/app/(landing)/Navbar"
-import Footer from "@/app/(landing)/Footer"
 import { Toaster } from "@/components/ui/sonner"
 import { Inter, Anuphan } from "next/font/google"
 
@@ -30,12 +28,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${anuphan.variable} font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system">
-          <Navbar />
-          <div className="mx-auto py-8">
-            {children}
-            <Toaster />
-          </div>
-          <Footer />
+          {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
