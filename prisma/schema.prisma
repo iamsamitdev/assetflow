@@ -13,9 +13,10 @@ datasource db {
 // นิยามตาราง (1 model = 1 table)
 model User {
   id           String        @id @default(cuid())
-  email        String        @unique
   name         String
-  password     String
+  email        String        @unique
+  emailVerified Boolean      @default(false)
+  image         String?
   role         Role          @default(EMPLOYEE)
   departmentId String?
   department   Department?   @relation(fields: [departmentId], references: [id])
@@ -29,6 +30,10 @@ model User {
 
   @@index([email])
   @@index([departmentId])
+
+  sessions Session[]
+  accounts Account[]
+
   @@map("user")                             // ตั้งชื่อตารางใน DB เป็น "user"
 }
 
@@ -122,4 +127,55 @@ model AuditLog {
   @@index([entity, entityId])
   @@index([userId])
   @@index([createdAt])
+}
+
+// ==========================================
+// Better Auth Core Schema
+// ==========================================
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  userId                String
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  idToken               String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("account")
+}
+
+
+model Verification {
+  id         String    @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
+
+  @@map("verification")
 }

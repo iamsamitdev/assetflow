@@ -13,6 +13,18 @@ const prisma = new PrismaClient({ adapter })
 async function main() {
   console.log("🌱 Seeding database...")
 
+  // ลบข้อมูลเก่า (ลบตามลำดับ FK dependency)
+  console.log("🗑️  Clearing old data...")
+  await prisma.auditLog.deleteMany()
+  await prisma.requestLog.deleteMany()
+  await prisma.post.deleteMany()
+  await prisma.session.deleteMany()
+  await prisma.account.deleteMany()
+  await prisma.asset.deleteMany()
+  await prisma.user.deleteMany()
+  await prisma.department.deleteMany()
+  await prisma.verification.deleteMany()
+
   // สร้างแผนก
   const itDept = await prisma.department.upsert({
     where: { code: "IT" },
@@ -39,11 +51,26 @@ async function main() {
     create: {
       name: "ผู้ดูแลระบบ",
       email: "admin@assetflow.com",
-      password: await bcrypt.hash("password123", 10),
+      emailVerified: true,
       role: Role.ADMIN,
       departmentId: itDept.id,
     },
   })
+
+  // สร้าง Account สำหรับ admin (Better Auth credential)
+  const adminAccount = await prisma.account.findFirst({
+    where: { userId: admin.id, providerId: "credential" },
+  })
+  if (!adminAccount) {
+    await prisma.account.create({
+      data: {
+        userId: admin.id,
+        accountId: admin.id,
+        providerId: "credential",
+        password: await bcrypt.hash("password123", 10),
+      },
+    })
+  }
 
   const somchai = await prisma.user.upsert({
     where: { email: "somchai@assetflow.com" },
@@ -51,11 +78,26 @@ async function main() {
     create: {
       name: "สมชาย ใจดี",
       email: "somchai@assetflow.com",
-      password: await bcrypt.hash("password123", 10),
+      emailVerified: true,
       role: Role.EMPLOYEE,
       departmentId: hrDept.id,
     },
   })
+
+  // สร้าง Account สำหรับ somchai
+  const somchaiAccount = await prisma.account.findFirst({
+    where: { userId: somchai.id, providerId: "credential" },
+  })
+  if (!somchaiAccount) {
+    await prisma.account.create({
+      data: {
+        userId: somchai.id,
+        accountId: somchai.id,
+        providerId: "credential",
+        password: await bcrypt.hash("password123", 10),
+      },
+    })
+  }
 
   // สร้างครุภัณฑ์
   const assets = [

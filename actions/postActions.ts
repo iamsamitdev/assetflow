@@ -11,6 +11,7 @@ export const getPosts = async () => {
                 user: {
                     select: {
                         name: true,
+                        image: true,
                     },
                 }
             }
@@ -30,7 +31,8 @@ export const getPostById = async (id: string) => {
             include: {
                 user: {
                     select: {
-                        name: true
+                        name: true,
+                        image: true,
                     },
                 }
             }
