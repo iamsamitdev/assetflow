@@ -18,6 +18,7 @@ const navLinks = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/service", label: "Service" },
+  { href: "/blog", label: "Blog" },
   { href: "/contact", label: "Contact" },
 ]
 
@@ -29,7 +30,7 @@ export default function Navbar() {
   return (
     <NavigationMenu className="fixed top-0 left-0 z-50 flex flex-wrap justify-between items-center min-w-full px-4 py-2 
     bg-background/80 backdrop-blur-md border-b dark:bg-gray-800/80 dark:text-white">
-
+        
         <Link href="/" className="text-lg font-bold">
           AssetFlow
         </Link>
@@ -72,7 +73,7 @@ export default function Navbar() {
           </NavigationMenuLink>
           <NavigationMenuLink asChild>
             <Button className="ml-2">
-              Sign Up
+              Register
             </Button>
           </NavigationMenuLink>
         </div>

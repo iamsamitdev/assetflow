@@ -1,0 +1,43 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// ─── ส่วนที่ 1: Generator ───
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+// ─── ส่วนที่ 2: Datasource ───
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── ส่วนที่ 3: Models ───
+// นิยามตาราง (1 model = 1 table)
+model User {
+  id        String   @id @default(cuid())   // Primary Key
+  name      String                          // Required field
+  email     String   @unique                // Unique constraint
+  image     String?                         // Optional field (? = nullable)
+  role      String   @default("user")       // Default value
+  createdAt DateTime @default(now())        // Auto timestamp
+  updatedAt DateTime @updatedAt             // Auto update timestamp
+
+  posts     Post[]                          // Relation: 1 User มีหลาย Posts
+
+  @@map("user")                             // ตั้งชื่อตารางใน DB เป็น "user"
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  title     String
+  content   String?
+  userId    String                          // Foreign Key
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("post")
+}
