@@ -1,17 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Package, Search, Plus } from "lucide-react"
-import Link from "next/link"
-
-// ─── Mock Data (จะเปลี่ยนเป็นดึงจาก Prisma จริงทีหลัง) ───
-const mockAssets = [
-    { id: "1", name: "MacBook Pro 16\" M3", serialNumber: "MBP-2026-001", status: "AVAILABLE" as const, department: "ฝ่ายพัฒนาซอฟต์แวร์", description: "แล็ปท็อปสำหรับพัฒนาระบบ" },
-    { id: "2", name: "Dell Monitor 27\" 4K", serialNumber: "MON-2026-012", status: "IN_USE" as const, department: "ฝ่ายออกแบบ", description: "จอมอนิเตอร์ 4K สำหรับงานออกแบบ" },
-    { id: "3", name: "HP LaserJet Pro MFP", serialNumber: "PRT-2025-003", status: "MAINTENANCE" as const, department: "ฝ่ายธุรการ", description: "เครื่องพิมพ์เลเซอร์มัลติฟังก์ชัน" },
-    { id: "4", name: "iPad Pro 13\" M4", serialNumber: "TAB-2026-007", status: "IN_USE" as const, department: "ฝ่ายการตลาด", description: "แท็บเล็ตสำหรับนำเสนองาน" },
-    { id: "5", name: "Logitech MX Keys", serialNumber: "KEY-2026-020", status: "AVAILABLE" as const, department: "ฝ่ายพัฒนาซอฟต์แวร์", description: "คีย์บอร์ดไร้สาย" },
-    { id: "6", name: "Canon EOS R6 Mark II", serialNumber: "CAM-2025-002", status: "RETIRED" as const, department: "ฝ่ายสื่อสารองค์กร", description: "กล้อง Mirrorless สำหรับถ่ายงานอีเวนต์" },
-]
+import { Package, Search } from "lucide-react"
+import { getAssets, getAssetStats } from "@/actions/assetActions"
+import { getDepartments } from "@/actions/departmentActions"
+import AddAssetButton from "./AddAssetButton"
 
 const statusConfig = {
     AVAILABLE: { label: "พร้อมใช้งาน", variant: "default" as const, className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" },
@@ -20,7 +12,13 @@ const statusConfig = {
     RETIRED: { label: "ปลดระวาง", variant: "destructive" as const, className: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" },
 }
 
-export default function AssetContent() {
+export default async function AssetContent() {
+    const [assets, assetStats, departments] = await Promise.all([
+        getAssets(),
+        getAssetStats(),
+        getDepartments(),
+    ])
+
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -38,23 +36,17 @@ export default function AssetContent() {
                             className="pl-9 pr-4 py-2 text-sm border rounded-lg bg-background w-50 focus:outline-none focus:ring-2 focus:ring-primary"
                         />
                     </div>
-                    <Link
-                        href="/assets"
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition"
-                    >
-                        <Plus className="h-4 w-4" />
-                        เพิ่มครุภัณฑ์
-                    </Link>
+                    <AddAssetButton departments={departments.map(d => ({ id: d.id, name: d.name, code: d.code }))} />
                 </div>
             </div>
 
             {/* Stats Summary */}
             <div className="grid gap-3 sm:grid-cols-4">
                 {[
-                    { label: "ทั้งหมด", value: mockAssets.length, color: "text-gray-900 dark:text-white" },
-                    { label: "พร้อมใช้งาน", value: mockAssets.filter(a => a.status === "AVAILABLE").length, color: "text-emerald-600" },
-                    { label: "กำลังใช้งาน", value: mockAssets.filter(a => a.status === "IN_USE").length, color: "text-blue-600" },
-                    { label: "ซ่อมบำรุง", value: mockAssets.filter(a => a.status === "MAINTENANCE").length, color: "text-amber-600" },
+                    { label: "ทั้งหมด", value: assetStats.total, color: "text-gray-900 dark:text-white" },
+                    { label: "พร้อมใช้งาน", value: assetStats.available, color: "text-emerald-600" },
+                    { label: "กำลังใช้งาน", value: assetStats.inUse, color: "text-blue-600" },
+                    { label: "ซ่อมบำรุง", value: assetStats.maintenance, color: "text-amber-600" },
                 ].map((s) => (
                     <Card key={s.label}>
                         <CardContent className="p-4 text-center">
@@ -85,7 +77,7 @@ export default function AssetContent() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y">
-                                {mockAssets.map((asset) => {
+                                {assets.map((asset) => {
                                     const status = statusConfig[asset.status]
                                     return (
                                         <tr key={asset.id} className="hover:bg-muted/50 transition">
@@ -94,7 +86,7 @@ export default function AssetContent() {
                                                 <p className="text-xs text-muted-foreground">{asset.description}</p>
                                             </td>
                                             <td className="py-3 font-mono text-xs">{asset.serialNumber}</td>
-                                            <td className="py-3">{asset.department}</td>
+                                            <td className="py-3">{asset.department.name}</td>
                                             <td className="py-3">
                                                 <Badge variant={status.variant} className={status.className}>
                                                     {status.label}

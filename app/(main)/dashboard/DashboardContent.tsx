@@ -17,53 +17,56 @@ import {
 } from "lucide-react"
 
 import Link from "next/link"
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
+import { redirect } from "next/navigation"
+import { getAssetStats } from "@/actions/assetActions"
+import { getRequestStats, getRequests } from "@/actions/requestActions"
+import { getUserStats } from "@/actions/userActions"
+import { getDepartments } from "@/actions/departmentActions"
+import { getAuditLogs } from "@/actions/auditLogActions"
 
-// ─── Mock Data (จะเปลี่ยนเป็นดึงจาก session + prisma จริงทีหลัง) ───
-const mockUser = {
-    name: "สมชาย ใจดี",
-    role: "admin" as "admin" | "employee" | "user",
-}
+export default async function DashboardContent() {
+    // ─── Auth Session ───
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    })
 
-const mockStats = {
-    totalUsers: 25,
-    totalAssets: 150,
-    availableAssets: 80,
-    inUseAssets: 55,
-    maintenanceAssets: 15,
-    pendingRequests: 8,
-    totalDepartments: 6,
-}
+    if (!session) {
+        redirect("/signin")
+    }
 
-const mockRecentRequests = [
-    { id: "1", status: "PENDING" as const, asset: { name: "MacBook Pro 16 M3" }, user: { name: "สมหญิง รักเรียน" }, createdAt: new Date("2026-03-10T09:30:00") },
-    { id: "2", status: "APPROVED" as const, asset: { name: "Dell Monitor 27\"" }, user: { name: "วิชัย สมบูรณ์" }, createdAt: new Date("2026-03-09T14:15:00") },
-    { id: "3", status: "REJECTED" as const, asset: { name: "iPad Pro 13\"" }, user: { name: "นภา ศรีสุข" }, createdAt: new Date("2026-03-09T11:00:00") },
-    { id: "4", status: "APPROVED" as const, asset: { name: "Logitech MX Keys" }, user: { name: "ธนพล จิตดี" }, createdAt: new Date("2026-03-08T16:45:00") },
-    { id: "5", status: "RETURNED" as const, asset: { name: "HP LaserJet Pro" }, user: { name: "พิมพ์ใจ สุขสันต์" }, createdAt: new Date("2026-03-08T10:20:00") },
-]
+    const user = session.user as typeof session.user & { role: string }
+    const isAdmin = user.role === "admin"
 
-const mockAuditLogs = [
-    { id: "1", action: "CREATE", entity: "Asset", user: { name: "สมชาย ใจดี" }, createdAt: new Date("2026-03-10T10:00:00") },
-    { id: "2", action: "APPROVE", entity: "RequestLog", user: { name: "สมชาย ใจดี" }, createdAt: new Date("2026-03-09T14:20:00") },
-    { id: "3", action: "UPDATE", entity: "Asset", user: { name: "สมชาย ใจดี" }, createdAt: new Date("2026-03-09T09:30:00") },
-    { id: "4", action: "REJECT", entity: "RequestLog", user: { name: "สมชาย ใจดี" }, createdAt: new Date("2026-03-08T15:00:00") },
-    { id: "5", action: "CREATE", entity: "Department", user: { name: "สมชาย ใจดี" }, createdAt: new Date("2026-03-07T11:45:00") },
-]
+    // ─── Fetch Data ───
+    const [assetStats, requestStats, userStats, departments, auditLogResult, allRequests] =
+        await Promise.all([
+            getAssetStats(),
+            getRequestStats(),
+            isAdmin ? getUserStats() : null,
+            getDepartments(),
+            getAuditLogs({ limit: 5 }),
+            getRequests(),
+        ])
 
-export default function DashboardContent() {
-    const isAdmin = mockUser.role === "admin"
-
-    const { totalUsers, totalAssets, availableAssets, inUseAssets, maintenanceAssets, pendingRequests, totalDepartments } = mockStats
-    const recentRequests = mockRecentRequests
-    const recentAuditLogs = mockAuditLogs
+    const totalAssets = assetStats.total
+    const availableAssets = assetStats.available
+    const inUseAssets = assetStats.inUse
+    const maintenanceAssets = assetStats.maintenance
+    const pendingRequests = requestStats.pending
+    const totalUsers = userStats?.total ?? 0
+    const totalDepartments = departments.length
+    const recentRequests = allRequests.slice(0, 5)
+    const recentAuditLogs = auditLogResult.logs
 
     // ─── Stats Cards ─────────────────────────────────────
     const stats = [
         {
             title: "สถานะบัญชี",
-            value: isAdmin ? "Admin" : mockUser.role === "employee" ? "Employee" : "User",
+            value: isAdmin ? "Admin" : user.role === "employee" ? "Employee" : "User",
             icon: Shield,
-            description: `เข้าสู่ระบบในชื่อ ${mockUser.name}`,
+            description: `เข้าสู่ระบบในชื่อ ${user.name}`,
             color: "text-purple-600 dark:text-purple-400",
             bg: "bg-purple-50 dark:bg-purple-900/20",
         },
@@ -166,7 +169,7 @@ export default function DashboardContent() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                        สวัสดี, {mockUser.name} 👋
+                        สวัสดี, {user.name} 👋
                     </h2>
                     <p className="text-muted-foreground mt-1">
                         ยินดีต้อนรับสู่ระบบจัดการครุภัณฑ์ Asset Flow

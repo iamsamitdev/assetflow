@@ -1,20 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Building2, Package, Users, Plus } from "lucide-react"
-import Link from "next/link"
+import { Building2, Package, Users } from "lucide-react"
+import { getDepartments } from "@/actions/departmentActions"
+import AddDepartmentButton from "./AddDepartmentButton"
 
-// ─── Mock Data (จะเปลี่ยนเป็นดึงจาก Prisma จริงทีหลัง) ───
-const mockDepartments = [
-    { id: "1", name: "ฝ่ายพัฒนาซอฟต์แวร์", code: "DEV", userCount: 8, assetCount: 25 },
-    { id: "2", name: "ฝ่ายออกแบบ", code: "DSG", userCount: 5, assetCount: 15 },
-    { id: "3", name: "ฝ่ายการตลาด", code: "MKT", userCount: 4, assetCount: 12 },
-    { id: "4", name: "ฝ่ายธุรการ", code: "ADM", userCount: 3, assetCount: 18 },
-    { id: "5", name: "ฝ่ายสื่อสารองค์กร", code: "COM", userCount: 3, assetCount: 10 },
-    { id: "6", name: "ฝ่ายบัญชีและการเงิน", code: "FIN", userCount: 2, assetCount: 8 },
-]
+export default async function DepartmentContent() {
+    const departments = await getDepartments()
 
-export default function DepartmentContent() {
-    const totalUsers = mockDepartments.reduce((sum, d) => sum + d.userCount, 0)
-    const totalAssets = mockDepartments.reduce((sum, d) => sum + d.assetCount, 0)
+    const totalUsers = departments.reduce((sum, d) => sum + d._count.users, 0)
+    const totalAssets = departments.reduce((sum, d) => sum + d._count.assets, 0)
 
     return (
         <div className="space-y-6">
@@ -24,19 +17,13 @@ export default function DepartmentContent() {
                     <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">แผนก</h2>
                     <p className="text-muted-foreground mt-1">จัดการแผนกและดูครุภัณฑ์ในแต่ละแผนก</p>
                 </div>
-                <Link
-                    href="/departments"
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition"
-                >
-                    <Plus className="h-4 w-4" />
-                    เพิ่มแผนก
-                </Link>
+                <AddDepartmentButton />
             </div>
 
             {/* Stats */}
             <div className="grid gap-3 sm:grid-cols-3">
                 {[
-                    { label: "แผนกทั้งหมด", value: mockDepartments.length, icon: Building2, color: "text-purple-600" },
+                    { label: "แผนกทั้งหมด", value: departments.length, icon: Building2, color: "text-purple-600" },
                     { label: "บุคลากรรวม", value: totalUsers, icon: Users, color: "text-blue-600" },
                     { label: "ครุภัณฑ์รวม", value: totalAssets, icon: Package, color: "text-emerald-600" },
                 ].map((s) => (
@@ -56,7 +43,7 @@ export default function DepartmentContent() {
 
             {/* Department Cards */}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {mockDepartments.map((dept) => (
+                {departments.map((dept) => (
                     <Card key={dept.id} className="hover:shadow-md transition-shadow">
                         <CardHeader className="pb-3">
                             <div className="flex items-center justify-between">
@@ -69,11 +56,11 @@ export default function DepartmentContent() {
                             <div className="flex items-center gap-6 text-sm">
                                 <div className="flex items-center gap-2 text-muted-foreground">
                                     <Users className="h-4 w-4" />
-                                    <span>{dept.userCount} คน</span>
+                                    <span>{dept._count.users} คน</span>
                                 </div>
                                 <div className="flex items-center gap-2 text-muted-foreground">
                                     <Package className="h-4 w-4" />
-                                    <span>{dept.assetCount} ชิ้น</span>
+                                    <span>{dept._count.assets} ชิ้น</span>
                                 </div>
                             </div>
                         </CardContent>

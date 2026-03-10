@@ -1,16 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Users, Shield, Search } from "lucide-react"
-
-// ─── Mock Data (จะเปลี่ยนเป็นดึงจาก Prisma จริงทีหลัง) ───
-const mockUsers = [
-    { id: "1", name: "สมชาย ใจดี", email: "somchai@example.com", role: "admin" as const, department: "ฝ่ายพัฒนาซอฟต์แวร์", banned: false, createdAt: new Date("2026-01-15") },
-    { id: "2", name: "สมหญิง รักเรียน", email: "somying@example.com", role: "employee" as const, department: "ฝ่ายพัฒนาซอฟต์แวร์", banned: false, createdAt: new Date("2026-01-20") },
-    { id: "3", name: "วิชัย สมบูรณ์", email: "wichai@example.com", role: "employee" as const, department: "ฝ่ายออกแบบ", banned: false, createdAt: new Date("2026-02-01") },
-    { id: "4", name: "นภา ศรีสุข", email: "napa@example.com", role: "user" as const, department: "ฝ่ายการตลาด", banned: false, createdAt: new Date("2026-02-10") },
-    { id: "5", name: "ธนพล จิตดี", email: "thanapon@example.com", role: "employee" as const, department: "ฝ่ายธุรการ", banned: false, createdAt: new Date("2026-02-15") },
-    { id: "6", name: "พิมพ์ใจ สุขสันต์", email: "pimjai@example.com", role: "user" as const, department: "ฝ่ายสื่อสารองค์กร", banned: true, createdAt: new Date("2026-03-01") },
-]
+import { getUsers, getUserStats } from "@/actions/userActions"
 
 const roleConfig = {
     admin: { label: "Admin", className: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400" },
@@ -18,7 +9,12 @@ const roleConfig = {
     user: { label: "User", className: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400" },
 }
 
-export default function UserContent() {
+export default async function UserContent() {
+    const [users, userStats] = await Promise.all([
+        getUsers(),
+        getUserStats(),
+    ])
+
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -40,9 +36,9 @@ export default function UserContent() {
             {/* Stats */}
             <div className="grid gap-3 sm:grid-cols-3">
                 {[
-                    { label: "ผู้ใช้ทั้งหมด", value: mockUsers.length, icon: Users, color: "text-blue-600" },
-                    { label: "Admin", value: mockUsers.filter(u => u.role === "admin").length, icon: Shield, color: "text-purple-600" },
-                    { label: "ถูกระงับ", value: mockUsers.filter(u => u.banned).length, icon: Shield, color: "text-red-600" },
+                    { label: "ผู้ใช้ทั้งหมด", value: userStats.total, icon: Users, color: "text-blue-600" },
+                    { label: "Admin", value: userStats.admins, icon: Shield, color: "text-purple-600" },
+                    { label: "ถูกระงับ", value: userStats.banned, icon: Shield, color: "text-red-600" },
                 ].map((s) => (
                     <Card key={s.label}>
                         <CardContent className="p-4 flex items-center gap-4">
@@ -80,7 +76,7 @@ export default function UserContent() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y">
-                                {mockUsers.map((user) => {
+                                {users.map((user) => {
                                     const role = roleConfig[user.role]
                                     return (
                                         <tr key={user.id} className="hover:bg-muted/50 transition">
@@ -93,7 +89,7 @@ export default function UserContent() {
                                                 </div>
                                             </td>
                                             <td className="py-3 text-muted-foreground">{user.email}</td>
-                                            <td className="py-3">{user.department}</td>
+                                            <td className="py-3">{user.department?.name ?? "-"}</td>
                                             <td className="py-3">
                                                 <Badge variant="secondary" className={role.className}>{role.label}</Badge>
                                             </td>

@@ -3,16 +3,10 @@
 import { useState, useRef, useEffect } from "react"
 import ThemeToggle from "@/components/ThemeToggle"
 import Link from "next/link"
-
-// ─── Mock Data (จะเปลี่ยนเป็นดึงจาก session จริงทีหลัง) ───
-const mockUser = {
-    name: "สมชาย ใจดี",
-    email: "somchai@example.com",
-    image: null as string | null,
-    role: "admin",
-}
+import { useSession, signOut } from "@/lib/auth-client"
 
 export function UserMenu() {
+    const { data: session, isPending } = useSession()
     const [isOpen, setIsOpen] = useState(false)
     const menuRef = useRef<HTMLDivElement>(null)
 
@@ -27,8 +21,23 @@ export function UserMenu() {
         return () => document.removeEventListener("mousedown", handleClickOutside)
     }, [])
 
+    // Loading state
+    if (isPending) {
+        return (
+            <div className="flex items-center gap-2">
+                <ThemeToggle />
+                <div className="w-9 h-9 rounded-full bg-muted animate-pulse" />
+            </div>
+        )
+    }
+
+    if (!session?.user) return null
+
+    const user = session.user
+    const userRole = ((user as Record<string, unknown>).role as string) ?? "user"
+
     // สร้าง Avatar Initials จากชื่อผู้ใช้
-    const initials = mockUser.name
+    const initials = (user.name ?? "?")
         .split(" ")
         .map((n) => n[0])
         .join("")
@@ -46,7 +55,7 @@ export function UserMenu() {
                 className="flex items-center gap-2.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition pl-3 pr-1.5 py-1.5"
             >
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-200 hidden sm:block">
-                    {mockUser.name}
+                    {user.name}
                 </span>
 
                 <div className="w-9 h-9 rounded-full bg-linear-to-br from-purple-500 to-indigo-600 flex items-center justify-center ring-2 ring-purple-100 dark:ring-purple-900">
@@ -67,10 +76,10 @@ export function UserMenu() {
                 <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                     {/* User Info */}
                     <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
-                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{mockUser.name}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{mockUser.email}</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{user.name}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{user.email}</p>
                         <span className="inline-block mt-2 px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300">
-                            {mockUser.role.toUpperCase()}
+                            {userRole.toUpperCase()}
                         </span>
                     </div>
 
@@ -91,9 +100,14 @@ export function UserMenu() {
                     {/* Logout */}
                     <div className="px-2 pt-1 pb-1">
                         <button
-                            onClick={() => {
-                                // TODO: เปลี่ยนเป็น signOut() จริงทีหลัง
-                                window.location.href = "/signin"
+                            onClick={async () => {
+                                await signOut({
+                                    fetchOptions: {
+                                        onSuccess: () => {
+                                            window.location.href = "/signin"
+                                        },
+                                    },
+                                })
                             }}
                             className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl transition font-medium"
                         >
