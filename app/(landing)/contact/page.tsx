@@ -1,4 +1,4 @@
-import ContactContent from "./ContactContent"
+import ContactContent from "@/app/(landing)/contact/ContactContent"
 import { Metadata } from "next"
 
 export const metadata: Metadata = {

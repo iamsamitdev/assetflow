@@ -17,7 +17,10 @@ model User {
   email        String        @unique
   emailVerified Boolean      @default(false)
   image         String?
-  role         Role          @default(EMPLOYEE)
+  role         Role          @default(user)
+  banned       Boolean?      @default(false)
+  banReason     String?
+  banExpires    DateTime?
   departmentId String?
   department   Department?   @relation(fields: [departmentId], references: [id])
   requests     RequestLog[]
@@ -49,8 +52,9 @@ model Post {
 }
 
 enum Role {
-  ADMIN
-  EMPLOYEE
+  user
+  admin
+  employee
 }
 
 model Department {

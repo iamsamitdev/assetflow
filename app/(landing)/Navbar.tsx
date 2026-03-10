@@ -66,16 +66,12 @@ export default function Navbar() {
 
         <div className="hidden md:flex space-x-2">
           <ThemeToggle />
-          <NavigationMenuLink asChild>
-            <Button variant="outline" className="ml-auto">
-              Login
-            </Button>
-          </NavigationMenuLink>
-          <NavigationMenuLink asChild>
-            <Button className="ml-2">
-              Register
-            </Button>
-          </NavigationMenuLink>
+          <Button variant="outline" className="ml-auto" asChild>
+            <Link href="/signin">Login</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/signup">Register</Link>
+          </Button>
         </div>
 
         {/* Mobile menu */}

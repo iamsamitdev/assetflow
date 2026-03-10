@@ -1,4 +1,4 @@
-import ServiceContent from '@/app/service/ServiceContent'
+import ServiceContent from '@/app/(landing)/service/ServiceContent'
 
 import { Metadata } from 'next'
 

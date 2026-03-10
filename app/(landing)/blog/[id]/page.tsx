@@ -1,4 +1,4 @@
-import BlogDetail from '@/app/blog/[id]/BlogDetail'
+import BlogDetail from '@/app/(landing)/blog/[id]/BlogDetail'
 
 export default async function BlogDetailPage(
   { params }: { params: Promise<{ id: string }> }

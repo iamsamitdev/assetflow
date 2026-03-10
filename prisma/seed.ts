@@ -44,7 +44,7 @@ async function main() {
     create: { name: "ฝ่ายการเงิน", code: "FIN" },
   })
 
-  // สร้าง Users
+  // สร้าง Admin
   const admin = await prisma.user.upsert({
     where: { email: "admin@assetflow.com" },
     update: {},
@@ -52,7 +52,10 @@ async function main() {
       name: "ผู้ดูแลระบบ",
       email: "admin@assetflow.com",
       emailVerified: true,
-      role: Role.ADMIN,
+      role: Role.admin,
+      banned: false,
+      banReason: null,
+      banExpires: null,
       departmentId: itDept.id,
     },
   })
@@ -79,7 +82,10 @@ async function main() {
       name: "สมชาย ใจดี",
       email: "somchai@assetflow.com",
       emailVerified: true,
-      role: Role.EMPLOYEE,
+      role: Role.user,
+      banned: false,
+      banReason: null,
+      banExpires: null,
       departmentId: hrDept.id,
     },
   })
