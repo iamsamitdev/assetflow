@@ -1,11 +1,25 @@
 import { Sidebar } from "@/app/(main)/_components/sidebar"
 import { Header } from "@/app/(main)/_components/header"
 
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
+import { redirect } from "next/navigation"
+
 export default async function MainLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
+
+    // ตรวจสอบการเข้าสู่ระบบ
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    })
+
+    // ถ้าไม่ได้ Login → Redirect ไปหน้า Login
+    if (!session) {
+        redirect("/signin")
+    }
 
     return (
         <div className="flex h-screen bg-background">

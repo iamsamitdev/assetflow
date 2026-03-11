@@ -20,6 +20,7 @@ export interface NavItemType {
 export interface NavSectionType {
     title?: string
     items: NavItemType[]
+    allowedRoles?: string[]  // ถ้าไม่กำหนด = ทุก role เห็นได้
 }
 
 export const sidebarData: NavSectionType[] = [
@@ -43,6 +44,7 @@ export const sidebarData: NavSectionType[] = [
             { title: "Audit Logs", href: "/admin/audit-logs", icon: ScrollText },
             { title: "Settings", href: "/admin/settings", icon: Settings },
         ],
+        allowedRoles: ["admin"],  // เฉพาะ admin เห็นได้
     },
 ]
 

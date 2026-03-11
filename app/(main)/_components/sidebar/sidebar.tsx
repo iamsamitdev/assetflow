@@ -8,12 +8,23 @@ import { sidebarData, bottomNavItems } from "@/app/(main)/_components/sidebar/si
 import { NavSection } from "@/app/(main)/_components/sidebar/nav-section"
 import { NavItem } from "@/app/(main)/_components/sidebar/nav-item"
 
+import { useSession } from "@/lib/auth-client"
+
 interface SidebarProps {
     className?: string
 }
 
 export function Sidebar({ className }: SidebarProps) {
     const [collapsed, setCollapsed] = useState(false)
+
+    // ดึงข้อมูล session เพื่อใช้ในการตรวจสอบ role
+    const { data: session } = useSession()
+    const userRoles = ((session?.user as { role?: string })?.role || "user").split(",").map((r) => r.trim())
+
+    // กรอง section ตาม role ของผู้ใช้ (รองรับ multi-role)
+    const filteredSections = sidebarData.filter(
+        (section) => !section.allowedRoles || section.allowedRoles.some((r) => userRoles.includes(r))
+    )
 
     return (
         <aside
@@ -57,7 +68,7 @@ export function Sidebar({ className }: SidebarProps) {
             <div className="flex-1 overflow-y-auto">
                 <div className={cn("py-4", collapsed ? "px-1" : "px-3")}>
                     <div className="space-y-2">
-                        {sidebarData.map((section, index) => (
+                        {filteredSections.map((section, index) => (
                             <NavSection
                                 key={index}
                                 section={section}
