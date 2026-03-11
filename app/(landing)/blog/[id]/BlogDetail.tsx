@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft, UserCircle2 } from "lucide-react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import { connection } from "next/server"
 
 export default async function BlogDetail(
     { id }: { id: string }
 ) {
+  await connection()
   const post = await getPostById(id)
 
   if (!post) {

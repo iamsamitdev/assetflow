@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Settings, Globe, Bell, Database, Shield } from "lucide-react"
+import { Globe, Bell, Database, Shield } from "lucide-react"
 import { toast } from "sonner"
 
 export default function SettingContent() {

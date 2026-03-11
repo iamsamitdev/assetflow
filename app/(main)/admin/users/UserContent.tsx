@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Users, Shield, Search } from "lucide-react"
 import { getUsers, getUserStats } from "@/actions/userActions"
+import { connection } from "next/server"
 
 const roleConfig = {
     admin: { label: "Admin", className: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400" },
@@ -10,6 +11,7 @@ const roleConfig = {
 }
 
 export default async function UserContent() {
+    await connection()
     const [users, userStats] = await Promise.all([
         getUsers(),
         getUserStats(),

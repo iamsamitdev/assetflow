@@ -14,6 +14,8 @@ import { Menu, X } from "lucide-react"
 import Link from "next/link"
 import ThemeToggle from "@/components/ThemeToggle"
 
+import useCounterStore from "@/stores/useCounterStore"
+
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
@@ -23,6 +25,8 @@ const navLinks = [
 ]
 
 export default function Navbar() {
+
+  const { count } = useCounterStore()
 
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -65,7 +69,11 @@ export default function Navbar() {
         </NavigationMenuItem>
 
         <div className="hidden md:flex space-x-2">
+
+          <div className="border rounded px-2 py-1">{count}</div>
+
           <ThemeToggle />
+
           <Button variant="outline" className="ml-auto" asChild>
             <Link href="/signin">Login</Link>
           </Button>

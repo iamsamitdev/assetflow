@@ -3,9 +3,10 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { CalendarDays, UserCircle2 } from "lucide-react"
 import Link from "next/link"
+import { connection } from "next/server"
 
 export default async function BlogContent() {
-
+  await connection()
   const posts = await getPosts()
 
   return (

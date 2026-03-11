@@ -17,6 +17,6 @@ export const metadata: Metadata = {
     ],
 }
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
     return <DashboardContent />
 }

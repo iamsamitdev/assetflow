@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ScrollText, Search, Plus, Pencil, Trash2, CheckCircle2, XCircle } from "lucide-react"
 import { getAuditLogs } from "@/actions/auditLogActions"
+import { connection } from "next/server"
 
 const actionConfig: Record<string, { label: string; icon: typeof Plus; className: string }> = {
     CREATE: { label: "CREATE", icon: Plus, className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" },
@@ -12,6 +13,7 @@ const actionConfig: Record<string, { label: string; icon: typeof Plus; className
 }
 
 export default async function AuditLogContent() {
+    await connection()
     const { logs: auditLogs, pagination } = await getAuditLogs()
 
     return (

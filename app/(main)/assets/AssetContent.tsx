@@ -4,6 +4,7 @@ import { Package, Search } from "lucide-react"
 import { getAssets, getAssetStats } from "@/actions/assetActions"
 import { getDepartments } from "@/actions/departmentActions"
 import AddAssetButton from "./AddAssetButton"
+import { connection } from "next/server"
 
 const statusConfig = {
     AVAILABLE: { label: "พร้อมใช้งาน", variant: "default" as const, className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" },
@@ -13,6 +14,7 @@ const statusConfig = {
 }
 
 export default async function AssetContent() {
+    await connection()
     const [assets, assetStats, departments] = await Promise.all([
         getAssets(),
         getAssetStats(),

@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+// import { useState } from "react"
 import Link from "next/link"
-import { PanelLeftClose, PanelLeft, LibraryBig, Sparkles } from "lucide-react"
+import { PanelLeftClose, PanelLeft, LibraryBig } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { sidebarData, bottomNavItems } from "@/app/(main)/_components/sidebar/sidebar-data"
 import { NavSection } from "@/app/(main)/_components/sidebar/nav-section"
@@ -10,12 +10,17 @@ import { NavItem } from "@/app/(main)/_components/sidebar/nav-item"
 
 import { useSession } from "@/lib/auth-client"
 
+import useCollapseStore from "@/stores/useCollapseStore"
+
 interface SidebarProps {
     className?: string
 }
 
 export function Sidebar({ className }: SidebarProps) {
-    const [collapsed, setCollapsed] = useState(false)
+
+    // const [collapsed, setCollapsed] = useState(false)
+    const collapsed = useCollapseStore((state) => state.sidebarCollapsed)
+    const toggleSidebarCollapsed = useCollapseStore((state) => state.toggleSidebarCollapsed)
 
     // ดึงข้อมูล session เพื่อใช้ในการตรวจสอบ role
     const { data: session } = useSession()
@@ -52,7 +57,7 @@ export function Sidebar({ className }: SidebarProps) {
                     </Link>
                 )}
                 <button
-                    onClick={() => setCollapsed(!collapsed)}
+                    onClick={toggleSidebarCollapsed}
                     className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                     aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
                 >

@@ -1,0 +1,23 @@
+networks:
+  app-network:
+    driver: bridge
+
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:7300
+    container_name: assetflow-app
+    ports:
+      - "7300:3000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: "postgresql://neondb_owner:npg_Jc7imbQqr1KP@ep-flat-night-a1f4sc37-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-network

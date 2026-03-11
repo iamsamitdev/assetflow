@@ -2,8 +2,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Building2, Package, Users } from "lucide-react"
 import { getDepartments } from "@/actions/departmentActions"
 import AddDepartmentButton from "./AddDepartmentButton"
+import { connection } from "next/server"
 
 export default async function DepartmentContent() {
+    await connection()
     const departments = await getDepartments()
 
     const totalUsers = departments.reduce((sum, d) => sum + d._count.users, 0)
